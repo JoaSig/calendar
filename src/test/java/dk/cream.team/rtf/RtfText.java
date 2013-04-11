@@ -35,7 +35,7 @@ import java.io.*;
 import java.net.URL;
 
 /**
- * Class for RTF text with different text formattings like bold, italic, ...
+ * Class for RTF text with different text formattings like boldDarkGray, italic, ...
  */
 public class RtfText
 {
@@ -172,8 +172,8 @@ public class RtfText
 
   /**
    * Bold a given text.
-   * @param text Text to be set bold.
-   * @return New RtfText object representing this bold text.
+   * @param text Text to be set boldDarkGray.
+   * @return New RtfText object representing this boldDarkGray text.
    */
   public static RtfText bold( Object text )
   {

@@ -41,7 +41,7 @@ import java.util.regex.*;
  * <pre>
  * Rtf.template( new FileInputStream("template.rtf) )
  *    .inject( "ADDRESSLINE1", "tutego" )
- *    .inject( "ADDRESSLINE2", bold("Sonsbeck") )
+ *    .inject( "ADDRESSLINE2", boldDarkGray("Sonsbeck") )
  *    .out( FileOutputStream("out.rtf") );
  * </pre>
  * Just use ASCII-keys.

@@ -40,7 +40,7 @@ import java.util.*;
  * <p>
  * Example how to generate a RTF file:
  * <pre>
- * Rtf.rtf().p( "Hello", bold("RTF") ).out( new FileWriter("out.rtf") );
+ * Rtf.rtf().p( "Hello", boldDarkGray("RTF") ).out( new FileWriter("out.rtf") );
  * </pre>
  */
 public class Rtf

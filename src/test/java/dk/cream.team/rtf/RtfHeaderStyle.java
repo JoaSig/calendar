@@ -35,8 +35,8 @@
 //
 //
 ////       .header( 
-////               parStyle( "Heading 2").fontSize( 40 ).bold().at( 2 ),
-////               parStyle( "Heading 3").fontSize( 13 ).bold().at( 3 )
+////               parStyle( "Heading 2").fontSize( 40 ).boldDarkGray().at( 2 ),
+////               parStyle( "Heading 3").fontSize( 13 ).boldDarkGray().at( 3 )
 ////               )
 ////           .lastSection( p("sdfgsfg").style( 1 ) );
 //
@@ -350,7 +350,7 @@
 //  /**
 //   * Bold.
 //   */
-//  public RtfHeaderStyle bold()
+//  public RtfHeaderStyle boldDarkGray()
 //  {
 //    chrfmt.append( "\\b" );
 //    return this;

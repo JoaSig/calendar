@@ -11,6 +11,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.List;
 import com.itextpdf.text.ListItem;
@@ -24,7 +25,11 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfShading;
+import com.itextpdf.text.pdf.PdfShadingPattern;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.ShadingColor;
+import com.itextpdf.text.pdf.VerticalText;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
@@ -34,6 +39,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Duration;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -52,9 +58,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 
@@ -122,6 +132,95 @@ public class AppTest {
     }
 
     @Test
+    public void testShading() throws IOException, DocumentException {
+        // step 1
+        Document document = new Document();
+        // step 2
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("shade.pdf"));
+        // step 3
+        document.open();
+        // step 4
+        PdfContentByte canvas = writer.getDirectContent();
+        PdfShading axial = PdfShading.simpleAxial(writer, 36, 616, 396, 688,
+                new BaseColor(0xFF, 0xF7, 0x94),
+                new BaseColor(0xF7, 0x8A, 0x6B));
+        canvas.paintShading(axial);
+        document.newPage();
+
+        PdfShading radial = PdfShading.simpleRadial(writer, 200, 700, 50, 300, 700, 100,
+                new BaseColor(0xFF, 0xF7, 0x94),
+                new BaseColor(0xF7, 0x8A, 0x6B),
+                false, false);
+        canvas.paintShading(radial);
+
+        PdfShadingPattern shading = new PdfShadingPattern(axial);
+        colorRectangle(canvas, new ShadingColor(shading), 150, 420, 126, 126);
+        canvas.setShadingFill(shading);
+        canvas.ellipse(300, 420, 126, 126);
+        canvas.fillStroke();
+
+        // step 5
+        document.close();
+
+    }
+
+    public void colorRectangle(PdfContentByte canvas, BaseColor color, float x, float y, float width, float height) {
+        canvas.saveState();
+        canvas.setColorFill(color);
+        canvas.rectangle(x, y, width, height);
+        canvas.fillStroke();
+        canvas.restoreState();
+
+        canvas.saveState();
+        canvas.setColorFill(color);
+        canvas.circle(x + 120, y + 210, width - 30);
+        canvas.fillStroke();
+        canvas.restoreState();
+    }
+
+
+    @Test
+    public void testDate() {
+
+        String atta = "08:00";
+        String niu = "09:00";
+        String niu30 = "09:30";
+        String niu15 = "09:15";
+        String tiu = "10:00";
+
+        java.util.List<String> numbers = Arrays.asList(
+                niu30,
+                niu,
+                atta,
+                niu15,
+                tiu);
+
+//        Collections.sort(numbers);
+
+        String time1345 = "13:45";
+        String lowest = time1345;
+        for (String number : numbers) {
+            if (number.compareTo(atta) < 0) {
+                lowest = number;
+            }
+        }
+
+        if (lowest.equals(atta)){
+            time1345 = "0";
+        }
+
+        FontFactory.registerDirectory("/Users/Jo/Downloads/SFM_3.0.2_Magic/system/fonts");
+        FontFactory.registerDirectory("/Library/Fonts");
+//        FontFactory.registerDirectory("/Users/Jo/Documents/Fonts", true);
+
+        GregorianCalendar gregorianCalendar = new GregorianCalendar(new Locale("da"));
+        String week = DateUtil.formatCalendarWeek(gregorianCalendar);
+
+        String day = DateUtil.formatCalendarDay(gregorianCalendar);
+
+    }
+
+    @Test
     public void testCreatePDF() throws IOException, COSVisitorException, ParserException {
 
         PDDocument document = null;
@@ -151,7 +250,6 @@ public class AppTest {
             document.save("test.pdf");
             document.close();
 
-
         } finally {
             if (document != null) {
                 document.close();
@@ -173,37 +271,95 @@ public class AppTest {
     @Test
     public void readPDF() throws IOException {
 //        Document document = new Document();
-        PdfReader reader = new PdfReader(new FileInputStream("CALENDAR.pdf"));
+//        PdfReader reader = new PdfReader(new FileInputStream("CalendarForm.pdf"));
+//
+//        AcroFields form = reader.getAcroFields();
+//        Set<String> formFields = form.getFields().keySet();
+//        for (String key : formFields) {
+//            System.out.println(key + ": ");
+//            switch (form.getFieldType(key)) {
+//                case AcroFields.FIELD_TYPE_CHECKBOX:
+//                    System.out.println("Checkbox");
+//                    break;
+//                case AcroFields.FIELD_TYPE_COMBO:
+//                    System.out.println("Combobox");
+//                    break;
+//                case AcroFields.FIELD_TYPE_LIST:
+//                    System.out.println("List");
+//                    break;
+//                case AcroFields.FIELD_TYPE_NONE:
+//                    System.out.println("None");
+//                    break;
+//                case AcroFields.FIELD_TYPE_PUSHBUTTON:
+//                    System.out.println("Pushbutton");
+//                    break;
+//                case AcroFields.FIELD_TYPE_RADIOBUTTON:
+//                    System.out.println("Radiobutton");
+//                    break;
+//                case AcroFields.FIELD_TYPE_SIGNATURE:
+//                    System.out.println("Signature");
+//                    break;
+//                case AcroFields.FIELD_TYPE_TEXT:
+//                    System.out.println("Text");
+//                    break;
+//                default:
+//                    System.out.println("?");
+//            } }
 
-        AcroFields acroFields = reader.getAcroFields();
-        Map<String, AcroFields.Item> fields = acroFields.getFields();
-        for (AcroFields.Item item : fields.values()) {
-            if (item.size() != 0) {
-//                item.values.get(0).getKeys().iterator().next().setContent("FUCK");
-//                        item.getValue(0)
-            }
-        }
-
-        for (String s : fields.keySet()) {
-
-            if (s.toLowerCase().contains("date".toLowerCase())) {
-                AcroFields.Item item = fields.get(s);
-                boolean string = item.getValue(0).getKeys().iterator().next().isString();
-                AcroFields.Item newItem = new AcroFields.Item();
-
-            }
-        }
+//        AcroFields acroFields = reader.getAcroFields();
+//        Map<String, AcroFields.Item> fields = acroFields.getFields();
+//        for (AcroFields.Item item : fields.values()) {
+//            if (item.size() != 0) {
+////                item.values.get(0).getKeys().iterator().next().setContent("FUCK");
+////                        item.getValue(0)
+//            }
+//        }
+//
+//        for (String s : fields.keySet()) {
+//
+//            if (s.toLowerCase().contains("date".toLowerCase())) {
+//                AcroFields.Item item = fields.get(s);
+//                boolean string = item.getValue(0).getKeys().iterator().next().isString();
+//                AcroFields.Item newItem = new AcroFields.Item();
+//
+//            }
+//        }
     }
 
     @Test
     public void iText() throws IOException, DocumentException, ParserException {
-        Document document = new Document();
-        PdfWriter.getInstance(document, new FileOutputStream("Log-bog.pdf"));
-        document.open();
-        addMetaData(document);
-        addTitlePage(document);
-        addContent(document);
-        document.close();
+//        Document document = new Document();
+//        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream("CalendarForm.pdf"));
+//        document.open();
+
+//        BaseFont bf = BaseFont.createFont();
+//        Font font = new Font(bf, 20);
+//        VerticalText vt = new VerticalText(writer.getDirectContent());
+//        vt.setVerticalLayout(390, 570, 540, 12, 30);
+//        font = new Font(bf, 20);
+//        vt.addText(new Phrase(convertCIDs("TEXT1"), font));
+//        vt.go();
+//        vt.setAlignment(Element.ALIGN_RIGHT);
+//        vt.addText(new Phrase(convertCIDs("TEXT2"), font));
+//        vt.go();
+
+
+//        addMetaData(document);
+//        addTitlePage(document);
+//        addContent(document);
+//        document.close();
+    }
+
+    public String convertCIDs(String text) {
+        char cid[] = text.toCharArray();
+        for (int k = 0; k < cid.length; ++k) {
+            char c = cid[k];
+            if (c == '\n')
+                cid[k] = '\uff00';
+            else
+                cid[k] = (char) (c - ' ' + 8720);
+        }
+        return new String(cid);
     }
 
     // iText allows to add metadata to the PDF which can be viewed in your Adobe
